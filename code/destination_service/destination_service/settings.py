@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'migration_db',                         # Database name
         'USER': 'postgres',                             # PostgreSQL username
-        'PASSWORD': 'the_doors_of_perception',          # PostgreSQL password
+        'PASSWORD': '',                                 # PostgreSQL password
         'HOST': 'localhost',
         'PORT': '5432',
     }
