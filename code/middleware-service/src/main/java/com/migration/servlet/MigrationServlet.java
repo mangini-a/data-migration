@@ -17,9 +17,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/migrate")
 public class MigrationServlet extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(MigrationServlet.class.getName());
+
     // Define service URLs as constants
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
     private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
@@ -53,6 +57,7 @@ public class MigrationServlet extends HttpServlet {
             resp.getWriter().write(gson.toJson(result));
 
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error during migration", e);
             sendError(resp, "Error during migration: " + e.getMessage());
         }
     }
@@ -74,6 +79,10 @@ public class MigrationServlet extends HttpServlet {
 
             // Execute the request and get the response
             try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new IOException("Failed to fetch data from PHP service: " + response.getStatusLine().getReasonPhrase());
+                }
+
                 // Convert the response body to a string
                 String responseBody = EntityUtils.toString(response.getEntity());
 
@@ -103,6 +112,10 @@ public class MigrationServlet extends HttpServlet {
 
             // Execute the request and get the response
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new IOException("Failed to forward data to Python service: " + response.getStatusLine().getReasonPhrase());
+                }
+                
                 // Convert the response body to a string
                 String responseBody = EntityUtils.toString(response.getEntity());
 
