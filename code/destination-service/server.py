@@ -2,7 +2,6 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 import psycopg2
 from psycopg2 import Error
-from urllib.parse import parse_qs, urlparse
 
 # Target database configuration used throughout the application
 DB_CONFIG = {
@@ -14,14 +13,11 @@ DB_CONFIG = {
 }
 
 class DatabaseManager:
-    """
-    Handles all database operations including initialization and data processing.
-    This class encapsulates the database logic for better organization.
-    """
+    """Handles all database operations, including initialization and data processing."""
     @staticmethod
     def init_database():
         """
-        Initializes the database and creates necessary tables if they don't exist.
+        Initializes the database and creates the necessary tables if they don't exist.\n
         Returns True if successful, False if an error occurs.
         """
         try:
@@ -76,7 +72,7 @@ class DatabaseManager:
     @staticmethod
     def process_data(data):
         """
-        Processes received JSON data and stores it in the database.
+        Processes the received JSON data and stores it in the database.\n
         Returns a tuple of (success_boolean, message_string, records_processed_count)
         """
         try:
@@ -109,11 +105,11 @@ class DatabaseManager:
         
 class MigrationRequestHandler(BaseHTTPRequestHandler):
     """
-    Handles incoming HTTP requests from the Jakarta servlet.
+    Handles incoming HTTP requests from the Jakarta servlet.\n
     This class defines how the server responds to different types of requests.
     """
     def _send_response(self, status_code, message):
-        """Helper method to send JSON responses"""
+        """Helper method to send JSON responses."""
         self.send_response(status_code)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
@@ -121,18 +117,19 @@ class MigrationRequestHandler(BaseHTTPRequestHandler):
             "status": "success" if status_code == 200 else "error",
             "message": message
         })
-        self.wfile.write(response.encode('utf-8'))
+        self.wfile.write(response.encode("utf-8"))
 
     def do_POST(self):
-        """Handle POST requests from the Jakarta servlet"""
+        """Handles POST requests from the Jakarta servlet."""
         if self.path == '/receive':
             # Read and parse the request body
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
 
             try:
-                json_data = json.loads(post_data.decode('utf-8'))
-                success, message, records_processed = DatabaseManager.process_data(json_data)
+                # Deserialize the request body to a Python object
+                data = json.loads(post_data.decode("utf-8"))
+                success, message, records_processed = DatabaseManager.process_data(data)
 
                 if success:
                     self._send_response(200, message)
@@ -149,14 +146,15 @@ class MigrationRequestHandler(BaseHTTPRequestHandler):
 
     def run_server(host='localhost', port=5000):
         """
-        Initializes the database and starts the HTTP server.
+        Initializes the local database and starts the HTTP server.
         This is the main entry point for the application.
         """
-        # Initialize database before starting the server
+        # Initialize the local database before starting the server
         if not DatabaseManager.init_database():
             print("Failed to initialize database. Server will not start.")
             return
         
+        # Create and listen at the HTTP socket, dispatching the requests to a handler
         server_address = (host, port)
         httpd = HTTPServer(server_address, MigrationRequestHandler)
         print(f"Server running on http://{host}:{port}")
