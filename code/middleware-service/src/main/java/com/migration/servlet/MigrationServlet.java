@@ -18,7 +18,7 @@ public class MigrationServlet extends HttpServlet {
 
     // Define service URLs as constants
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
-    private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
+    private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive"; // ?
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,7 +43,7 @@ public class MigrationServlet extends HttpServlet {
             // Forward the data to the Python web service
             String result = forwardToPythonService(sourceData);
 
-            // Write the response
+            // Write the response (TO JSP)
             response.getWriter().write(result);
 
         } catch (Exception e) {
@@ -103,6 +103,6 @@ public class MigrationServlet extends HttpServlet {
     private void sendError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write(message);
+        response.getWriter().write(message); // TO JSP
     }
 }
