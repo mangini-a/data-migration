@@ -15,39 +15,28 @@
     <maven.compiler.target>22</maven.compiler.target>
     <!-- Character encoding for source files -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Versions for dependencies -->
-    <gson.version>2.12.1</gson.version>
-    <httpclient.version>4.5.14</httpclient.version>
-    <servlet.version>4.0.1</servlet.version>
   </properties>
 
   <dependencies>
-    <!-- Gson for JSON processing -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>${gson.version}</version>
-    </dependency>
-
-    <!-- Apache HttpClient for making HTTP requests -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${httpclient.version}</version>
-    </dependency>
-
     <!-- Servlet API - marked as provided since Tomcat provides it -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet.version}</version>
+      <version>4.0.1</version>
       <scope>provided</scope>
+    </dependency>
+
+    <!-- Unirest for making HTTP requests -->
+    <dependency>
+      <groupId>com.konghq</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>3.14.5</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-    <!-- Configure the war plugin -->
+      <!-- Configure the war plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
