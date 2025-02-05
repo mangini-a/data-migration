@@ -4,7 +4,7 @@ require_once('../config/config.php');
 header('Content-Type: application/json');
 
 try {
-    // Get the table of interest's name from the query parameter
+    // Get the requested table's name from the query parameter
     $tableName = isset($_GET['table']) ? $_GET['table'] : null;
 
     if (is_null($tableName)) {
@@ -37,13 +37,15 @@ try {
         throw new Exception("Connection failed: " . $conn->connect_error);
     }
 
-    // Get the table's structure
+    // Get the table's structure with data types
     $structureQuery = "DESCRIBE " . $tableName;
     $structureResult = $conn->query($structureQuery);
     $columns = [];
+    $columnTypes = [];
 
     while ($row = $structureResult->fetch_assoc()) {
         $columns[] = $row['Field'];
+        $columnTypes[$row['Field']] = $row['Type'];
     }
 
     // Fetch all the table's records
@@ -61,6 +63,7 @@ try {
         'status' => 'success',
         'table' => $tableName,
         'columns' => $columns,
+        'columnTypes' => $columnTypes,
         'data' => $data
     ]);
 
