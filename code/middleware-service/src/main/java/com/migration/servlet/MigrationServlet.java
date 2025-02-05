@@ -18,7 +18,7 @@ public class MigrationServlet extends HttpServlet {
 
     // Define service URLs as constants
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
-    private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive"; // ?
+    private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
