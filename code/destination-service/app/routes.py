@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from app.database import DatabaseManager
+import logging
 
 app = Flask(__name__)
 
@@ -7,10 +7,15 @@ app = Flask(__name__)
 def receive_data():
     try:
         data = request.get_json()
-        success, message, records_processed = DatabaseManager.process_data(data)
-        if success:
-            return jsonify({"status": "success", "message": message}), 200
-        else:
-            return jsonify({"status": "error", "message": message}), 500
+        table_name = data.get('table')
+        columns = data.get('columns')
+        records = data.get('data')
+
+        if not table_name or not columns or not records:
+            return jsonify({"status": "error", "message": "Invalid data format"}), 400
+
+        logging.info(f"Received data: {data}")
+
+        return jsonify({"status": "success", "message": "Data received successfully"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": f"Server error: {str(e)}"}), 500
