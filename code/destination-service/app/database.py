@@ -30,12 +30,14 @@ class DatabaseManager:
             # Close the connection to the default Postgres database
             cursor.close()
             conn.close()
+            return True
 
         except Error as error:
             print(f"Error during database initialization: {error}")
+            return False
 
     @staticmethod
-    def create_table(table_name, columns, column_types):
+    def create_table(table_name, column_types):
         try:
             # Connect to the target database
             conn = psycopg2.connect(**DB_CONFIG)

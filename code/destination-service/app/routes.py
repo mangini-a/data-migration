@@ -18,7 +18,7 @@ def receive_data():
         if not table_name or not columns or not column_types or not records:
             return jsonify({"status": "error", "message": "Invalid data format"}), 400
         
-        DatabaseManager.create_table(table_name, columns, column_types)
+        DatabaseManager.create_table(table_name, column_types)
         DatabaseManager.insert_data(table_name, columns, records)
 
         return jsonify({"status": "success", "message": f"Data inserted into {table_name}"}), 200
