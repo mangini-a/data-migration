@@ -1,8 +1,6 @@
 package com.migration.servlet;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +12,6 @@ import kong.unirest.Unirest;
 
 @WebServlet("/migrate")
 public class MigrationServlet extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(MigrationServlet.class.getName());
-
     // Define service URLs as constants
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
     private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
@@ -23,10 +19,10 @@ public class MigrationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Get the table of interest's name from the request parameter
+        // Get the the name of the table to be retrieved from the request parameter
         String tableName = request.getParameter("table");
                 
-        // Validate the table name parameter
+        // Validate the request parameter's value
         if (tableName == null || tableName.trim().isEmpty()) {
             sendError(response, "Table name parameter is required");
             return;
@@ -47,7 +43,6 @@ public class MigrationServlet extends HttpServlet {
             response.getWriter().write(result);
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during migration", e);
             sendError(response, "Error during migration: " + e.getMessage());
         }
     }
