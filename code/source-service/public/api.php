@@ -37,15 +37,13 @@ try {
         throw new Exception("Connection failed: " . $conn->connect_error);
     }
 
-    // Get the table's structure with data types
+    // Get the table's columns with data types
     $structureQuery = "DESCRIBE " . $tableName;
     $structureResult = $conn->query($structureQuery);
     $columns = [];
-    $columnTypes = [];
 
     while ($row = $structureResult->fetch_assoc()) {
-        $columns[] = $row['Field'];
-        $columnTypes[$row['Field']] = $row['Type'];
+        $columns[$row['Field']] = $row['Type'];
     }
 
     // Fetch all the table's records
@@ -63,7 +61,6 @@ try {
         'status' => 'success',
         'table' => $tableName,
         'columns' => $columns,
-        'columnTypes' => $columnTypes,
         'data' => $data
     ]);
 
