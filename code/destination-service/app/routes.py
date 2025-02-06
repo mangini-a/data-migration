@@ -12,14 +12,14 @@ def receive_data():
         # Get what is required to create and populate the table
         table_name = data.get('table')
         columns = data.get('columns')
-        column_types = data.get('columnTypes')
         records = data.get('data')
 
-        if not table_name or not columns or not column_types or not records:
+        if not table_name or not columns or not records:
             return jsonify({"status": "error", "message": "Invalid data format"}), 400
         
-        DatabaseManager.create_table(table_name, column_types)
-        DatabaseManager.insert_data(table_name, columns, records)
+        column_names = list(columns.keys())
+        DatabaseManager.create_table(table_name, columns)
+        DatabaseManager.insert_data(table_name, column_names, records)
 
         return jsonify({"status": "success", "message": f"Data inserted into {table_name}"}), 200
     

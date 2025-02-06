@@ -37,34 +37,27 @@ class DatabaseManager:
             return False
 
     @staticmethod
-    def create_table(table_name, column_types):
+    def create_table(table_name, columns):
         try:
             # Connect to the target database
             conn = psycopg2.connect(**DB_CONFIG)
             conn.set_session(autocommit=True)
             cursor = conn.cursor()
 
-            # Map MySQL data types to PostgreSQL data types
+            # Map MySQL data types in use to Postgres data types
             type_mapping = {
-                'int': 'INTEGER',
-                'text': 'TEXT',
-                'varchar': 'VARCHAR',
                 'date': 'DATE',
                 'enum': 'TEXT',
-                'datetime': 'TIMESTAMP',
-                'timestamp': 'TIMESTAMP',
-                'bigint': 'BIGINT',
-                'float': 'REAL',
-                'double': 'DOUBLE PRECISION',
-                'decimal': 'NUMERIC',
-                'boolean': 'BOOLEAN'
+                'int': 'INTEGER',
+                'text': 'TEXT',
+                'varchar': 'VARCHAR'
             }
 
             # Associate each column in the table with the correct Postgres data type
             column_definitions = []
-            for col, col_type in column_types.items():
+            for col_name, col_type in columns.items():
                 pg_type = type_mapping.get(col_type.split('(')[0], 'TEXT')
-                column_definitions.append(f"{col} {pg_type}")
+                column_definitions.append(f"{col_name} {pg_type}")
 
             # Perform a query to create the table
             column_definitions = ", ".join(column_definitions)
@@ -78,7 +71,7 @@ class DatabaseManager:
             print(f"Error creating table: {error}")
     
     @staticmethod
-    def insert_data(table_name, columns, data):
+    def insert_data(table_name, column_names, records):
         try:
             # Connect to the target database
             conn = psycopg2.connect(**DB_CONFIG)
@@ -86,13 +79,13 @@ class DatabaseManager:
             cursor = conn.cursor()
 
             # Prepare the statement to be executed
-            placeholders = ", ".join(["%s"] * len(columns))
-            column_names = ", ".join(columns)
-            insert_query = f"INSERT INTO {table_name} ({column_names}) VALUES ({placeholders})"
+            placeholders = ", ".join(["%s"] * len(column_names))
+            col_names = ", ".join(column_names)
+            insert_query = f"INSERT INTO {table_name} ({col_names}) VALUES ({placeholders})"
 
             # Perform a query to insert data for each table record
-            for record in data:
-                values = tuple(record.get(col) for col in columns)
+            for record in records:
+                values = tuple(record.get(col) for col in column_names)
                 cursor.execute(insert_query, values)
 
             # Close the connection to the target database
