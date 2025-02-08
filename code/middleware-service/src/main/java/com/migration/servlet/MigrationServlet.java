@@ -1,5 +1,8 @@
 package com.migration.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +19,9 @@ public class MigrationServlet extends HttpServlet {
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
     private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
 
+    // Create a single Gson instance for better performance
+    private final Gson gson = new Gson();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -24,26 +30,39 @@ public class MigrationServlet extends HttpServlet {
                 
         // Validate the request parameter's value
         if (tableName == null || tableName.trim().isEmpty()) {
-            sendError(response, "Table name parameter is required");
+            sendError(request, response, "Table name parameter is required.");
             return;
         }
-                
+         
         try {
+            // Show the user the current stage of migration (1)
+            String message = "Fetching " + tableName + "\'s data from the remote database...";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("index.jsp").forward(request, response);
+
             // Fetch data from the PHP web service
             String sourceData = fetchFromPhpService(tableName);
 
-            // request.setAttribute("sourceData", sourceData);
-            // request.getRequestDispatcher("index.jsp").forward(request, response);
-            // response.setContentType("text/html;charset=UTF-8");
-                    
+            // Show the user the current stage of migration (2)
+            message = "Inserting " + tableName + "\'s data into the local database...";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("index.jsp").forward(request, response);
+            
             // Forward the data to the Python web service
             String result = forwardToPythonService(sourceData);
+            
+            // Parse the JSON response from the Python web service
+            JsonObject responseJson = gson.fromJson(result, JsonObject.class);
+            String status = responseJson.get("status").getAsString();
+            String finalMessage = responseJson.get("message").getAsString();
 
-            // Write the response (TO JSP)
-            response.getWriter().write(result);
+            // Show the user the current stage of migration (3)
+            request.setAttribute("status", status);
+            request.setAttribute("message", finalMessage);
+            request.getRequestDispatcher("index.jsp").forward(request, response);
 
         } catch (Exception e) {
-            sendError(response, "Error during migration: " + e.getMessage());
+            sendError(request, response, "Error during migration: " + e.getMessage() + ".");
         }
     }
     
@@ -91,13 +110,15 @@ public class MigrationServlet extends HttpServlet {
     /**
      * Sends an error response to the client.
      * 
+     * @param request the HttpServletRequest object
      * @param response the HttpServletResponse object
      * @param message the error message to be sent
+     * @throws ServletException if there's an error forwarding the request
      * @throws IOException if there's an error writing the response
      */
-    private void sendError(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write(message); // TO JSP
+    private void sendError(HttpServletRequest request, HttpServletResponse response, String message)
+            throws ServletException, IOException {
+        request.setAttribute("message", message);
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 }
