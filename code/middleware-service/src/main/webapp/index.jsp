@@ -12,15 +12,17 @@
         <script src="js/script.js"></script>
     </head>
     <body>
-        <div id="header">
-            <h1>Data Migration Tool</h1>
-        </div>
-        <div id="selection">
-            <h3>Select a table to migrate to your local database:</h3>
-            <div id="table-container"></div>
-        </div>
-        <div id="stage">
-            <p id="message"></p>
+        <div class="container">
+            <div id="header">
+                <h1>Data Migration Tool</h1>
+            </div>
+            <div id="selection">
+                <h3>Select a table to migrate to your local database:</h3>
+                <div id="table-container"></div>
+            </div>
+            <div id="stage">
+                <p id="message"></p>
+            </div>
         </div>
     </body>
 </html>

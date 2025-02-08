@@ -32,8 +32,8 @@ function fetchTables() {
                 });
             } else {
                 // Handle API success but with error status
-                $message.text("Failed to fetch tables: " + (data.message || "Unknown error."))
-                    .css("color", "darkred");
+                $message.removeClass().addClass("error")
+                .text("Failed to fetch tables: " + (data.message || "Unknown error."));
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -53,8 +53,8 @@ function fetchTables() {
                 errorMessage += `${textStatus} - ${errorThrown}`;
             }
             
-            // Display the error message
-            $message.text(errorMessage).css("color", "darkred");
+            // Display the error message with error styling
+            $message.removeClass().addClass("error").text(errorMessage);
             
             // Log the error details for debugging
             console.error("Error details:", {
@@ -72,9 +72,11 @@ function fetchTables() {
  * @param {String} tableName the name of the table to be migrated
  */
 function makeGetRequest(tableName) {
-    // Show the user that the data transfer operation is in progress
     const $message = $("#message");
-    $message.text(`Migrating ${tableName}'s data...`).css("color", "#555");
+
+    // Show loading state during migration
+    $message.removeClass().addClass("loading")
+        .text(`Migrating ${tableName}'s data... Please wait.`);
 
     // Perform an asynchronous HTTP GET request to the servlet (60-second timeout)
     $.ajax({
@@ -86,9 +88,10 @@ function makeGetRequest(tableName) {
         timeout: 60000,
         success: function(data) {
             if (data.status === "success") {
-                $message.text(data.message).css("color", "#555");
+                $message.removeClass().addClass("success").text(data.message);
             } else {
-                $message.text(data.message || "Unknown error occurred.").css("color", "darkred");
+                $message.removeClass().addClass("error")
+                    .text(data.message || "Unknown error occurred.");
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -108,8 +111,8 @@ function makeGetRequest(tableName) {
                 errorMessage += `${textStatus} - ${errorThrown}`;
             }
 
-            // Display the error message
-            $message.text(errorMessage).css("color", "darkred");
+            // Display the error message with error styling
+            $message.removeClass().addClass("error").text(errorMessage);
 
             // Log the error details for debugging
             console.error("Migration error:", {
