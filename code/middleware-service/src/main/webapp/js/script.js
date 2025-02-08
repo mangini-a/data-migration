@@ -1,5 +1,6 @@
 $(document).ready(function() {
     fetchTables();
+    generateCopyright();
 });
 
 /**
@@ -122,4 +123,12 @@ function makeGetRequest(tableName) {
             });
         }
     });
+}
+
+function generateCopyright() {
+    $(".copyright").html("<p>&copy; " + getCurrentYear() + " Alessandro Mangini. All rights reserved.</p>");
+}
+
+function getCurrentYear() {
+    return new Date().getFullYear();
 }

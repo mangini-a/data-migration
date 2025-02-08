@@ -17,8 +17,11 @@ body {
 
 /* Main content container */
 .container {
+    display: flex;
+    flex-direction: column;
     width: 80%;
-    max-width: 800px;
+    max-width: 1000px;
+    min-height: calc(100vh - 4rem);
     margin: 2rem auto;
     padding: 2rem;
     background-color: white;
@@ -110,4 +113,40 @@ button:hover {
 .error {
     color: #E74C3C;
     font-weight: bold;
+}
+
+/* Footer styling */
+#footer {
+    margin-top: auto;
+    padding-top: 2rem;
+    border-top: 2px solid #EEE;
+}
+
+/* Practical information section */
+.practical-info {
+    background-color: #F8F9FA;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.practical-info h4 {
+    color: #2C3E50;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.practical-info p {
+    color: #34495E;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+/* Copyright section */
+.copyright {
+    text-align: center;
+    color: #7F8C8D;
+    font-size: 0.9rem;
+    padding: 1rem 0;
 }
