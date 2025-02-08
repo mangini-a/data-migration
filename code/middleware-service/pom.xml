@@ -18,6 +18,13 @@
   </properties>
 
   <dependencies>
+    <!-- Gson for sending JSON-formatted responses -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.12.1</version>
+    </dependency>
+
     <!-- Servlet API - marked as provided since Tomcat provides it -->
     <dependency>
       <groupId>javax.servlet</groupId>

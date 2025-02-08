@@ -1,5 +1,8 @@
 package com.migration.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,34 +19,33 @@ public class MigrationServlet extends HttpServlet {
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
     private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
 
+    // Create a Gson instance to be able to send JSON-formatted error responses to the client 
+    private final Gson gson = new Gson();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Get the the name of the table to be retrieved from the request parameter
+        // Get the table name of interest from request parameters
         String tableName = request.getParameter("table");
                 
-        // Validate the request parameter's value
+        // Validate the table name parameter
         if (tableName == null || tableName.trim().isEmpty()) {
-            sendError(response, "Table name parameter is required");
+            sendError(response, "Table name parameter is required.");
             return;
         }
-                
+         
         try {
             // Fetch data from the PHP web service
             String sourceData = fetchFromPhpService(tableName);
 
-            // request.setAttribute("sourceData", sourceData);
-            // request.getRequestDispatcher("index.jsp").forward(request, response);
-            // response.setContentType("text/html;charset=UTF-8");
-                    
             // Forward the data to the Python web service
             String result = forwardToPythonService(sourceData);
-
-            // Write the response (TO JSP)
+            
+            // Send its response to the client
             response.getWriter().write(result);
 
         } catch (Exception e) {
-            sendError(response, "Error during migration: " + e.getMessage());
+            sendError(response, "Error during migration: " + e.getMessage() + ".");
         }
     }
     
@@ -89,7 +91,7 @@ public class MigrationServlet extends HttpServlet {
     }
 
     /**
-     * Sends an error response to the client.
+     * Sends an error response to the client in JSON format.
      * 
      * @param response the HttpServletResponse object
      * @param message the error message to be sent
@@ -97,7 +99,10 @@ public class MigrationServlet extends HttpServlet {
      */
     private void sendError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write(message); // TO JSP
+        response.setContentType("application/json");
+        JsonObject error = new JsonObject();
+        error.addProperty("status", "error");
+        error.addProperty("message", message);
+        response.getWriter().write(gson.toJson(error));
     }
 }
