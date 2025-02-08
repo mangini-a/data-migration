@@ -11,13 +11,13 @@ function fetchTables() {
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
-                const tableContainer = $("#table-container");
-                tableContainer.html("");
+                const $tableContainer = $("#table-container");
+                $tableContainer.html("");
                 data.tables.forEach(table => {
-                    const button = document.createElement("button");
-                    button.text(table);
-                    button.on("click", makeGetRequest(table));
-                    button.appendTo(tableContainer);
+                    const $button = $("<button>");
+                    $button.text(table);
+                    $button.on("click", makeGetRequest(table));
+                    $button.appendTo($tableContainer);
                 });
             } else {
                 alert("Failed to fetch tables: " + data.message);
