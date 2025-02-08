@@ -20,7 +20,7 @@
             <div id="table-container"></div>
         </div>
         <div id="stage">
-            <p id="message" class="${status}">${message}</p>
+            <p id="message"></p>
         </div>
     </body>
 </html>
