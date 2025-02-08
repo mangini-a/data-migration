@@ -1,6 +1,7 @@
 <?php
 require_once('../config/config.php');
 
+header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
 try {
