@@ -4,70 +4,78 @@ $(document).ready(function() {
 });
 
 /**
- * Retrieves the list of tables from the remote database by means of an ad hoc PHP script.
- * Creates a button for each table, which when clicked makes a GET request to the servlet.
+ * Retrieves the list of tables from the remote database using the Fetch API.
+ * Creates interactive buttons for each table in the response.
 */
-function fetchTables() {
+async function fetchTables() {
     // Get references to DOM elements which will/could be updated
     const $tableContainer = $("#table-container");
     const $message = $("#message");
 
-    // Perform an asynchronous HTTP GET request to the PHP script (15-second timeout)
-    $.ajax({
-        url: "https://quizonline.altervista.org/second/public/fetch_tables.php",
-        dataType: "json",
-        timeout: 15000,
-        success: function(data) {
-            if (data.status === "success") {
-                // Clear existing content before adding new buttons
-                $tableContainer.empty();
+    const scriptUrl = "https://quizonline.altervista.org/second/public/fetch_tables.php";
+    try {
+        // Make the request to the PHP script
+        const response = await fetch(scriptUrl, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
 
-                // Create buttons for each table
-                data.tables.forEach(function(table) {
-                    $("<button>")
-                        .text(table)
-                        .on("click", function() {
-                            makeGetRequest(table);
-                        })
-                        .appendTo($tableContainer);
-                });
-            } else {
-                // Handle API success but with error status
-                $message.removeClass().addClass("error")
-                .text("Failed to fetch tables: " + (data.message || "Unknown error."));
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            let errorMessage = "Error fetching tables: ";
-            
-            if (textStatus === "timeout") {
-                errorMessage += "request timed out. Please try again.";
-            } else if (jqXHR.status === 0) {
-                errorMessage += "could not connect to the server. Please check your internet connection.";
-            } else if (jqXHR.status === 404) {
-                errorMessage += "the requested resource was not found.";
-            } else if (jqXHR.status === 500) {
-                errorMessage += "internal server error occurred.";
-            } else {
-                errorMessage += `${textStatus} - ${errorThrown}`;
-            }
-            
-            $message.removeClass().addClass("error").text(errorMessage);
-            console.error("Error details:", {
-                status: jqXHR.status,
-                textStatus: textStatus,
-                errorThrown: errorThrown
-            });
+        // Check if the response was successful
+        if (!response.ok) {
+            // Handle HTTP errors (like 404, 500, etc.)
+            throw new Error(`HTTP error! Response status: ${response.status}`);
         }
-    });
+
+        // Parse the JSON response
+        const json = await response.json();
+
+        if (json.status === "success") {
+            // Clear existing content before adding new buttons
+            $tableContainer.empty();
+
+            // Create buttons for each table
+            json.tables.forEach(function(table) {
+                $("<button>")
+                    .text(table)
+                    .on("click", function() {
+                        makeGetRequest(table);
+                    })
+                    .appendTo($tableContainer);
+            });
+        } else {
+            // Handle API success but with error status
+            $message.removeClass().addClass("error")
+            .text("Failed to fetch tables: " + (json.message || "Unknown error."));
+        }
+
+    } catch (error) {
+        // Construct an appropriate error message based on the error
+        let errorMessage = "Error fetching tables: ";
+
+        if (!navigator.onLine) {
+            // Check if the user is offline
+            errorMessage += "could not connect to the server. Please check your internet connection.";
+        } else if (error instanceof TypeError) {
+            // Network errors like CORS or offline result in TypeError
+            errorMessage += "could not connect to the server. Please try again.";
+        } else {
+            // For all other errors, use the error message
+            errorMessage += error.message;
+        }
+
+        $message.removeClass().addClass("error").text(errorMessage);
+        console.error("Error details:", error);
+    }
 }
 
 /**
- * Makes a GET request to the servlet and handles its JSON-formatted response.
+ * Makes a GET request to the servlet using the Fetch API.
+ * Updates the UI to show progress and results of the migration.
  * 
  * @param {String} tableName the name of the table to be migrated
  */
-function makeGetRequest(tableName) {
+async function makeGetRequest(tableName) {
     // Get references to DOM elements which will be updated
     const $message = $("#message");
     const $button = $(`button:contains('${tableName}')`);
@@ -77,51 +85,62 @@ function makeGetRequest(tableName) {
     $message.removeClass().addClass("loading")
         .text(`Migrating ${tableName}'s data... Please wait.`);
 
-    // Perform an asynchronous HTTP GET request to the servlet (2-minute timeout)
-    $.ajax({
-        url: "migrate",
-        data: {
-          table: tableName
-        },
-        dataType: "json",
-        timeout: 120000,
-        success: function(data) {
-            if (data.status === "success") {
-                $message.removeClass().addClass("success").text(data.message);
-            } else {
-                $message.removeClass().addClass("error")
-                    .text(data.message || "Unknown error occurred.");
+    const servletUrl = `migrate?table=${encodeURIComponent(tableName)}`;
+    try {
+        // Make the request to the servlet
+        const response = await fetch(servletUrl, {
+            headers: {
+                "Accept": "application/json"
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            let errorMessage = "Error occurred: ";
+        });
 
-            if (jqXHR.status === 0 && textStatus !== "timeout") {
-                errorMessage += "connection was aborted. Please try again."
-            } else if (jqXHR.status === 400) {
-                errorMessage += "the request could not be understood. Make sure the Python server is running.";
-            } else if (jqXHR.status === 404) {
-                errorMessage += "migration servlet not found. Please check your server configuration.";
-            } else if (jqXHR.status === 500) {
-                errorMessage += "server error during migration.";
-            } else if (textStatus === "timeout") {
-                errorMessage += "request timed out. The operation might still be processing.";
+        // Check if the response was successful
+        if (!response.ok) {
+            // Handle different HTTP error status codes
+            if (response.status === 400) {
+                throw new Error("the request could not be understood. Make sure the Python server is running.");
+            } else if (response.status === 404) {
+                throw new Error("migration servlet not found. Please check your server configuration.");
+            } else if (response.status === 500) {
+                throw new Error("server error during migration.");
             } else {
-                errorMessage += `${textStatus} - ${errorThrown}`;
+                throw new Error(`HTTP error! Response status: ${response.status}`);
             }
-
-            $message.removeClass().addClass("error").text(errorMessage);
-            console.error("Migration error:", {
-                status: jqXHR.status,
-                textStatus: textStatus,
-                errorThrown: errorThrown
-            });
-        },
-        complete: function() {
-            // Re-enable the button regardless of success/failure
-            $button.prop("disabled", false);
         }
-    });
+
+        // Parse the JSON response
+        const json = await response.json();
+
+        // Update UI based on response status
+        if (json.status === "success") {
+            $message.removeClass().addClass("success").text(json.message);
+        } else {
+            $message.removeClass().addClass("error")
+                .text(json.message || "Unknown error occurred.");
+        }
+
+    } catch (error) {
+        // Construct an appropriate error message based on the error
+        let errorMessage = "Error occurred: ";
+
+        if (!navigator.onLine) {
+            // Check if the user is offline
+            errorMessage += "connection was aborted. Please check your internet connection.";
+        } else if (error instanceof TypeError) {
+            // Network errors result in TypeError
+            errorMessage += "connection was aborted. Please try again.";
+        } else {
+            // For all other errors, use the error message
+            errorMessage += error.message;
+        }
+
+        $message.removeClass().addClass("error").text(errorMessage);
+        console.error("Migration error:", error);
+
+    } finally {
+        // Re-enable the button regardless of success/failure
+        $button.prop("disabled", false);
+    }
 }
 
 function generateCopyright() {
