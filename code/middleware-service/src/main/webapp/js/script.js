@@ -12,7 +12,7 @@ function fetchTables() {
     const $tableContainer = $("#table-container");
     const $message = $("#message");
 
-    // Make the AJAX request using jQuery (15-second timeout)
+    // Perform an asynchronous HTTP GET request to the PHP script (15-second timeout)
     $.ajax({
         url: "https://quizonline.altervista.org/second/public/fetch_tables.php",
         dataType: "json",
@@ -81,7 +81,7 @@ function makeGetRequest(tableName) {
 
     // Perform an asynchronous HTTP GET request to the servlet (60-second timeout)
     $.ajax({
-        url: "/middleware-service-1.0-SNAPSHOT/migrate",
+        url: "migrate",
         data: {
           table: tableName
         },
