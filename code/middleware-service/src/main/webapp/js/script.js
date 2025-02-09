@@ -12,10 +12,10 @@ async function fetchTables() {
     const $tableContainer = $("#table-container");
     const $message = $("#message");
 
-    const url = "https://quizonline.altervista.org/second/public/fetch_tables.php";
+    const scriptUrl = "https://quizonline.altervista.org/second/public/fetch_tables.php";
     try {
-        // Make the request to the PHP service
-        const response = await fetch(url, {
+        // Make the request to the PHP script
+        const response = await fetch(scriptUrl, {
             headers: {
                 "Accept": "application/json"
             }
@@ -85,10 +85,10 @@ async function makeGetRequest(tableName) {
     $message.removeClass().addClass("loading")
         .text(`Migrating ${tableName}'s data... Please wait.`);
 
-    const url = `migrate?table=${encodeURIComponent(tableName)}`;
+    const servletUrl = `migrate?table=${encodeURIComponent(tableName)}`;
     try {
         // Make the request to the servlet
-        const response = await fetch(url, {
+        const response = await fetch(servletUrl, {
             headers: {
                 "Accept": "application/json"
             }
@@ -112,11 +112,11 @@ async function makeGetRequest(tableName) {
         const json = await response.json();
 
         // Update UI based on response status
-        if (data.status === "success") {
-            $message.removeClass().addClass("success").text(data.message);
+        if (json.status === "success") {
+            $message.removeClass().addClass("success").text(json.message);
         } else {
             $message.removeClass().addClass("error")
-                .text(data.message || "Unknown error occurred.");
+                .text(json.message || "Unknown error occurred.");
         }
 
     } catch (error) {
