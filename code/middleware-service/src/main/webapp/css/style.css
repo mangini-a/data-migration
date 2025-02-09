@@ -81,36 +81,43 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Message styling */
+/* Message container styling */
 #stage {
     text-align: center;
     margin-top: 2rem;
 }
 
+/* Base message styling */
 #message {
     font-size: 1rem;
-    color: #7F8C8D;
     padding: 1rem;
     border-radius: 6px;
     background-color: #F8F9FA;
+    transition: all 0.3s ease;
 }
 
 /* Loading state styling */
-.loading {
+#message.loading {
     color: #E67E22;
     font-weight: bold;
+    border-left: 4px solid #E67E22;
+    background-color: #FEF5EB;
 }
 
 /* Success message styling */
-.success {
+#message.success {
     color: #27AE60;
     font-weight: bold;
+    border-left: 4px solid #27AE60;
+    background-color: #EBF7F2;
 }
 
 /* Error message styling */
-.error {
+#message.error {
     color: #E74C3C;
     font-weight: bold;
+    border-left: 4px solid #E74C3C;
+    background-color: #FDEDEC;
 }
 
 /* Footer styling */
