@@ -17,7 +17,7 @@ import kong.unirest.Unirest;
 
 @WebServlet("/migrate")
 public class MigrationServlet extends HttpServlet {
-    // Define service URLs as constants
+    // Define web service URLs as constants
     private static final String PHP_SERVICE_URL = "https://quizonline.altervista.org/second/public/api.php";
     private static final String PYTHON_SERVICE_URL = "http://localhost:5000/receive";
 
@@ -27,8 +27,9 @@ public class MigrationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Set the response's content type and prepare an object that can send it
-        response.setContentType("application/json");
+        // Set response headers
+        response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
         PrintWriter out = response.getWriter();
 
         // Get the table name of interest from request parameters
@@ -43,15 +44,26 @@ public class MigrationServlet extends HttpServlet {
         try {
             // Fetch data from the PHP web service
             String sourceData = fetchFromPhpService(tableName);
+            if (sourceData == null) {
+                sendError(out, "No data received from the PHP web service.");
+                return;
+            }
 
-            // Forward the data to the Python web service
+            // Forward retrieved data to the Python web service
             String result = forwardToPythonService(sourceData);
+            if (result == null) {
+                sendError(out, "No response received from the Python web service.");
+                return;
+            }
 
-            // Send its JSON-formatted response to the client
+            // Send the JSON-formatted outcome to the client
             out.write(result);
 
         } catch (Exception e) {
             sendError(out, "Error during migration: " + e.getMessage() + ".");
+        } finally {
+            out.flush();
+            out.close();
         }
     }
 

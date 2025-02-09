@@ -26,7 +26,7 @@
             <div id="footer">
                 <div class="practical-info">
                     <h4>Practical information</h4>
-                    <p>You don't need to worry about creating a PostgreSQL database: the <b>Python server</b>, which <b>must be started</b> by launching <i>run.py</i> from the <i>destination-service</i> project folder, will take care of it.</p>
+                    <p>You don't need to worry about creating a PostgreSQL database: the <b>Python server</b>, which <b>must be started</b> by launching <i>run.py</i> from the <i>destination-service</i> project folder, will take care of it relying on the default '<b>postgres</b>' database.</p>
                     <p>Please just ensure you don't currently own a database named '<b>target_db</b>' by looking at pgAdmin 4's Object Explorer section (inside Servers/PostgreSQL 17/Databases for the <a href="https://www.postgresql.org/about/news/postgresql-172-166-1510-1415-1318-and-1222-released-2965/">latest Postgres release</a>).</p>
                 </div>
                 <div class="copyright"></div>
