@@ -17,14 +17,14 @@ def receive_data():
         if not table_name or not columns or not records:
             return jsonify({
                 "status": "error", 
-                "message": "Invalid data format - missing required fields."
+                "message": "Invalid data format or missing required fields."
             }), 400
         
         # If table exists, return early without doing anything
         if DatabaseManager.table_exists(table_name):
             return jsonify({
                 "status": "success",
-                "message": f"Table {table_name} has already been migrated. No actions taken."
+                "message": f"Table '{table_name}' has already been migrated. No actions taken."
             }), 200
 
         # Create table and insert data only if the table didn't exist
@@ -32,17 +32,17 @@ def receive_data():
             if DatabaseManager.insert_data(table_name, list(columns.keys()), records):
                 return jsonify({
                     "status": "success", 
-                    "message": f"Created table {table_name} and inserted data successfully."
+                    "message": f"Created table '{table_name}' and inserted data successfully."
                 }), 200
             else:
                 return jsonify({
                     "status": "error",
-                    "message": f"Created table {table_name} but failed to insert data."
+                    "message": f"Created table '{table_name}' but failed to insert data."
                 }), 500
         else:
             return jsonify({
                 "status": "error",
-                "message": f"Failed to create table {table_name}."
+                "message": f"Failed to create table '{table_name}'."
             }), 500
     
     except Exception as e:
