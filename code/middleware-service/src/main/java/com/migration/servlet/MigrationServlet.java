@@ -69,7 +69,7 @@ public class MigrationServlet extends HttpServlet {
                 .asString();
 
         if (response.getStatus() != 200) {
-            throw new IOException("Failed to fetch data from PHP service: " + response.getStatusText());
+            throw new IOException("failed to fetch data from PHP service - " + response.getStatusText());
         }
 
         return response.getBody();
@@ -90,7 +90,7 @@ public class MigrationServlet extends HttpServlet {
                 .asString();
 
         if (response.getStatus() != 200) {
-            throw new IOException("Failed to forward data to Python service: " + response.getStatusText());
+            throw new IOException("failed to forward data to Python service - " + response.getStatusText());
         }
 
         return response.getBody();
