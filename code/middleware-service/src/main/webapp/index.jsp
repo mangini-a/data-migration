@@ -27,7 +27,7 @@
                 <div class="practical-info">
                     <h4>Practical information</h4>
                     <p>You don't need to worry about creating a PostgreSQL database: the Python server, which can be started by launching <i>run.py</i> from the <i>destination-service</i> project folder, will take care of it.</p>
-                    <p>Please just ensure you don't currently own a database named '<b>target_db</b>' by looking at pgAdmin 4's Object Explorer section (inside Servers\PostgreSQL 17\Databases for the latest Postgres release).</p>
+                    <p>Please just ensure you don't currently own a database named '<b>target_db</b>' by looking at pgAdmin 4's Object Explorer section (inside Servers/PostgreSQL 17/Databases for the latest Postgres release).</p>
                 </div>
                 <div class="copyright"></div>
             </div>

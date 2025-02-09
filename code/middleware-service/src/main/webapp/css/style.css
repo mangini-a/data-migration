@@ -4,7 +4,7 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-color: #F5F7FA; /* Light gray background for better contrast */
+    background-color: #F5F7FA;
 }
 
 /* Create a centered container for all content */
@@ -97,19 +97,19 @@ button:hover {
     background-color: #F8F9FA;
 }
 
-/* Add loading state styling */
+/* Loading state styling */
 .loading {
     color: #E67E22;
     font-weight: bold;
 }
 
-/* Add success message styling */
+/* Success message styling */
 .success {
     color: #27AE60;
     font-weight: bold;
 }
 
-/* Add error message styling */
+/* Error message styling */
 .error {
     color: #E74C3C;
     font-weight: bold;
