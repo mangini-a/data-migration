@@ -38,10 +38,8 @@ function fetchTables() {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            // Construct a meaningful error message based on the type of error
             let errorMessage = "Error fetching tables: ";
             
-            // Consider a number of relevant scenarios
             if (textStatus === "timeout") {
                 errorMessage += "request timed out. Please try again.";
             } else if (jqXHR.status === 0) {
@@ -54,10 +52,7 @@ function fetchTables() {
                 errorMessage += `${textStatus} - ${errorThrown}`;
             }
             
-            // Display the error message with error styling
             $message.removeClass().addClass("error").text(errorMessage);
-            
-            // Log the error details for debugging
             console.error("Error details:", {
                 status: jqXHR.status,
                 textStatus: textStatus,
@@ -73,20 +68,23 @@ function fetchTables() {
  * @param {String} tableName the name of the table to be migrated
  */
 function makeGetRequest(tableName) {
+    // Get references to DOM elements which will be updated
     const $message = $("#message");
+    const $button = $(`button:contains('${tableName}')`);
 
-    // Show loading state during migration
+    // Disable the button and show loading state during migration
+    $button.prop("disabled", true);
     $message.removeClass().addClass("loading")
         .text(`Migrating ${tableName}'s data... Please wait.`);
 
-    // Perform an asynchronous HTTP GET request to the servlet (60-second timeout)
+    // Perform an asynchronous HTTP GET request to the servlet (2-minute timeout)
     $.ajax({
         url: "migrate",
         data: {
           table: tableName
         },
         dataType: "json",
-        timeout: 60000,
+        timeout: 120000,
         success: function(data) {
             if (data.status === "success") {
                 $message.removeClass().addClass("success").text(data.message);
@@ -96,11 +94,11 @@ function makeGetRequest(tableName) {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            // Construct a meaningful error message based on the type of error
             let errorMessage = "Error occurred: ";
 
-            // Consider a number of relevant scenarios
-            if (jqXHR.status === 400) {
+            if (jqXHR.status === 0 && textStatus !== "timeout") {
+                errorMessage += "connection was aborted. Please try again."
+            } else if (jqXHR.status === 400) {
                 errorMessage += "the request could not be understood. Make sure the Python server is running.";
             } else if (jqXHR.status === 404) {
                 errorMessage += "migration servlet not found. Please check your server configuration.";
@@ -112,15 +110,16 @@ function makeGetRequest(tableName) {
                 errorMessage += `${textStatus} - ${errorThrown}`;
             }
 
-            // Display the error message with error styling
             $message.removeClass().addClass("error").text(errorMessage);
-
-            // Log the error details for debugging
             console.error("Migration error:", {
                 status: jqXHR.status,
                 textStatus: textStatus,
                 errorThrown: errorThrown
             });
+        },
+        complete: function() {
+            // Re-enable the button regardless of success/failure
+            $button.prop("disabled", false);
         }
     });
 }
